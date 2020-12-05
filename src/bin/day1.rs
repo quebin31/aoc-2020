@@ -1,6 +1,7 @@
 use anyhow::Result as AnyResult;
 use aoc_2020::lines;
 
+/// Load the file with the numbers and sort the array.
 fn load_and_sort() -> AnyResult<Vec<i32>> {
     let mut numbers = lines("files/day1/input.txt")?
         .filter_map(|number| number.parse().ok())
