@@ -4,6 +4,7 @@ use anyhow::Result as AnyResult;
 use aoc_2020::lines;
 use common_macros::hash_set;
 
+/// Holds a map to store key value pairs.
 struct Document {
     data: HashMap<String, String>,
 }
@@ -15,27 +16,32 @@ impl Document {
         }
     }
 
+    /// Check if the whole document is valid checking whether it contains all
+    /// the required keys and no more.
     fn is_valid(&self) -> bool {
         lazy_static::lazy_static! {
-            static ref VALID_KEYS: HashSet<&'static str> =
+            static ref REQUIRED_KEYS: HashSet<&'static str> =
                 hash_set!["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid", "cid"];
         }
 
-        let mut validated = 0;
-        for key in self.data.keys() {
-            if !VALID_KEYS.contains(key.as_str()) {
-                return false;
-            } else {
-                validated += match key.as_str() {
-                    "cid" => 0,
-                    _ => 1,
-                };
-            }
-        }
+        let mut found = 0;
+        let valid = self
+            .data
+            .keys()
+            .filter(|key| key.as_str() != "cid")
+            .all(|key| {
+                let present = REQUIRED_KEYS.contains(key.as_str());
+                found += if present { 1 } else { 0 };
+                present
+            });
 
-        VALID_KEYS.len() - 1 == validated
+        valid && REQUIRED_KEYS.len() - 1 == found
     }
 
+    /// Insert a new key value pair, if `validate` is true then `val` will be
+    /// validates according to the rules imposed by each key, if `val` was valid
+    /// returns true, otherwise returns false. If `validate` is false this function
+    /// always returns true.
     fn insert(&mut self, key: &str, val: &str, validate: bool) -> bool {
         if !validate {
             self.data.insert(key.to_owned(), val.to_owned());
@@ -60,6 +66,7 @@ impl Document {
         }
     }
 
+    /// Check whether a year is between the min and max values.
     fn is_valid_year(val: &str, min: u32, max: u32) -> bool {
         if let Ok(num) = val.parse::<u32>() {
             min <= num && num <= max
@@ -68,40 +75,45 @@ impl Document {
         }
     }
 
+    /// Check whether the height, given in cm or inches, is valid.
     fn is_valid_height(val: &str) -> bool {
         let unit = &val[(val.len() - 2)..];
+        let height = || val[..(val.len() - 2)].parse::<u32>();
 
-        if unit == "cm" || unit == "in" {
-            if let Ok(num) = val[..(val.len() - 2)].parse::<u32>() {
-                if unit == "cm" {
-                    150 <= num && num <= 193
-                } else {
-                    59 <= num && num <= 76
-                }
-            } else {
-                false
-            }
-        } else {
-            false
+        match (unit, height()) {
+            ("cm", Ok(height)) => 150 <= height && height <= 193,
+            ("in", Ok(height)) => 59 <= height && height <= 76,
+            _ => false,
         }
     }
 
+    /// Check whether a string is a valid hexadecimal color, i.e.:
+    /// - Lenght is 7
+    /// - Starts with '#'
+    /// - And the six remaining chars are hexadecimal digits
     fn is_valid_hex_color(val: &str) -> bool {
-        let mut chars = val.chars();
-        let valid = chars.next().map(|c| c == '#').unwrap_or(false);
-        valid && chars.all(|c| c.is_ascii_hexdigit())
+        let chars: Vec<_> = val.chars().collect();
+        let valid_prefix = || chars.get(0).map(|c| *c == '#').unwrap_or(false);
+        let valid_suffix = || chars.iter().skip(1).all(|c| c.is_ascii_hexdigit());
+
+        chars.len() == 7 && valid_prefix() && valid_suffix()
     }
 
+    /// Check an string against a fixed set of values.
     fn is_valid_eye_color(val: &str) -> bool {
         matches!(val, "amb" | "blu" | "brn" | "gry" | "grn" | "hzl" | "oth")
     }
 
+    /// Check whether a string is a valid passport id, i.e.:
+    /// - Lenght is 9
+    /// - All characters are digits.
     fn is_valid_pid(val: &str) -> bool {
         val.len() == 9 && val.chars().all(|c| c.is_ascii_digit())
     }
 }
 
-fn quest1() -> AnyResult<usize> {
+/// Count how many documents are valid, part 1 without data validation.
+fn part1() -> AnyResult<usize> {
     let mut count = 0;
 
     let mut doc = Document::new();
@@ -125,7 +137,8 @@ fn quest1() -> AnyResult<usize> {
     Ok(count)
 }
 
-fn quest2() -> AnyResult<usize> {
+/// Count how many documents are valid, part 2 with data validation.
+fn part2() -> AnyResult<usize> {
     let mut count = 0;
 
     let mut ignore_current = false;
@@ -153,6 +166,8 @@ fn quest2() -> AnyResult<usize> {
             }
 
             let kv = kv.split(':').collect::<Vec<_>>();
+            // If doc.insert(..) returns false, we should ignore this document since
+            // its data is invalid.
             ignore_current = !doc.insert(&kv[0].to_owned(), &kv[1].to_owned(), true);
         }
     }
@@ -161,11 +176,11 @@ fn quest2() -> AnyResult<usize> {
 }
 
 fn main() -> AnyResult<()> {
-    let quest1_result = quest1()?;
-    println!("Day 4, Quest 1: {}", quest1_result);
+    let part1_result = part1()?;
+    println!("Day 4, Part 1: {}", part1_result);
 
-    let quest2_result = quest2()?;
-    println!("Day 4, Quest 2: {}", quest2_result);
+    let part2_result = part2()?;
+    println!("Day 4, Part 2: {}", part2_result);
 
     Ok(())
 }
