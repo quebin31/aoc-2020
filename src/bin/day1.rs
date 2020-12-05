@@ -10,9 +10,11 @@ fn load_and_sort() -> AnyResult<Vec<i32>> {
     Ok(numbers)
 }
 
-/// One possible naive solution:
-/// Needs two traverse the array at least (n * (n - 1))/ 2 times, i.e. O(n^2)
-/// This solution sorts the array, i.e. O(n log(n)). Then traverses the array
+/// Naive solution:
+/// Needs two traverse the array at least (n * (n - 1))/ 2 times, i.e. O(n^2).
+///
+/// Optimized solution:
+/// Receives a sorted array, i.e. O(n log(n)). Then traverses the array
 /// one time, for each element calculates how much it needs to reach 2020, and
 /// performs a binary search, i.e. O(n log(n)), if the element is in the array
 /// we found both numbers. Total O(n log(n)).
@@ -29,7 +31,7 @@ fn part1(numbers: &[i32]) -> Option<i32> {
 
 /// Same logic as before but instead now we traverse n(n - 1) / 2 times the array
 /// (two for's), sum both numbers and search the complement to 2020, this takes
-/// O(n^2 * log(n)) which is already better than O(n^3) for naive solution (three for's).
+/// O(n^2 * log(n)) which is already better than O(n^3) for a naive solution (three for's).
 fn part2(numbers: &[i32]) -> Option<i32> {
     numbers.iter().enumerate().find_map(|(idx, number_a)| {
         numbers.iter().skip(idx + 1).find_map(|number_b| {
