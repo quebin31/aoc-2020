@@ -8,7 +8,7 @@ fn partitioner(l: char, r: char) -> impl Fn(&str, usize, usize) -> usize {
             match d {
                 d if d == l => hi = (hi + lo) / 2,
                 d if d == r => lo = (hi + lo) / 2 + 1,
-                _ => unreachable!(),
+                _ => panic!("Unexpected char in string"),
             }
         }
 
