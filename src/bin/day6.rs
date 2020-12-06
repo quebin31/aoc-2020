@@ -3,8 +3,11 @@ use std::collections::HashSet;
 use anyhow::Result as AnyResult;
 use aoc_2020::lines;
 
+/// Groups of 'yes' answers.
 type GroupAnswers = HashSet<char>;
 
+/// Group together all answers from each group to which anyone
+/// in it answered 'yes'.
 fn anyone_yes_answers() -> AnyResult<Vec<GroupAnswers>> {
     let mut groups = Vec::new();
     let mut group_yes_answers = HashSet::new();
@@ -26,9 +29,13 @@ fn anyone_yes_answers() -> AnyResult<Vec<GroupAnswers>> {
     Ok(groups)
 }
 
+/// Group together all answers from each group to which everyone
+/// in it answered 'yes'.
 fn everyone_yes_answers() -> AnyResult<Vec<GroupAnswers>> {
     let mut groups = Vec::new();
     let mut group_yes_answers = HashSet::new();
+
+    // Used to initialized the group yes answers set.
     let mut first_person = true;
 
     for line in lines("files/day6/input.txt")? {
@@ -36,6 +43,7 @@ fn everyone_yes_answers() -> AnyResult<Vec<GroupAnswers>> {
             // Finished collecting answers from one group
             groups.push(group_yes_answers);
             group_yes_answers = HashSet::new();
+
             first_person = true;
         } else {
             let person_yes_answers: HashSet<_> = line.chars().collect();
@@ -60,6 +68,7 @@ fn everyone_yes_answers() -> AnyResult<Vec<GroupAnswers>> {
     Ok(groups)
 }
 
+/// Count 'yes' answers from an array of group answers.
 fn count_yes_answers(groups: &[GroupAnswers]) -> usize {
     groups.iter().map(|group| group.len()).sum()
 }
