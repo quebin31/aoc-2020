@@ -35,7 +35,7 @@ fn everyone_yes_answers() -> AnyResult<Vec<GroupAnswers>> {
     let mut groups = Vec::new();
     let mut group_yes_answers = HashSet::new();
 
-    // Used to initialized the group yes answers set.
+    // Used to initialize the group yes answers set.
     let mut first_person = true;
 
     for line in lines("files/day6/input.txt")? {
