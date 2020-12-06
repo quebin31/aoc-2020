@@ -51,12 +51,8 @@ fn part2(numbers: &[i32]) -> Option<i32> {
 
 fn main() -> AnyResult<()> {
     let numbers = load_and_sort()?;
-
-    let part1_result = part1(&numbers);
-    println!("Day 1, Part 1: {:?}", part1_result);
-
-    let part2_result = part2(&numbers);
-    println!("Dat 2, Part 2: {:?}", part2_result);
+    println!("Day 1, Part 1: {:?}", part1(&numbers));
+    println!("Dat 2, Part 2: {:?}", part2(&numbers));
 
     Ok(())
 }

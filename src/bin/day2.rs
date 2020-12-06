@@ -79,12 +79,8 @@ fn part2(entries: &[Components]) -> usize {
 
 fn main() -> AnyResult<()> {
     let entries = load_and_split()?;
-
-    let part1_result = part1(&entries);
-    println!("Day 2, Part 1: {}", part1_result);
-
-    let part2_result = part2(&entries);
-    println!("Day 2, Part 2: {}", part2_result);
+    println!("Day 2, Part 1: {}", part1(&entries));
+    println!("Day 2, Part 2: {}", part2(&entries));
 
     Ok(())
 }

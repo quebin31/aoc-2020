@@ -54,12 +54,8 @@ fn part2(map: &Map) -> usize {
 
 fn main() -> AnyResult<()> {
     let map = Map::build_map()?;
-
-    let part1_result = part1(&map);
-    println!("Day 3, Part 1: {}", part1_result);
-
-    let part2_result = part2(&map);
-    println!("Day 3, Part 2: {}", part2_result);
+    println!("Day 3, Part 1: {}", part1(&map));
+    println!("Day 3, Part 2: {}", part2(&map));
 
     Ok(())
 }

@@ -176,11 +176,8 @@ fn part2() -> AnyResult<usize> {
 }
 
 fn main() -> AnyResult<()> {
-    let part1_result = part1()?;
-    println!("Day 4, Part 1: {}", part1_result);
-
-    let part2_result = part2()?;
-    println!("Day 4, Part 2: {}", part2_result);
+    println!("Day 4, Part 1: {}", part1()?);
+    println!("Day 4, Part 2: {}", part2()?);
 
     Ok(())
 }
