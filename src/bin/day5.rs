@@ -1,29 +1,28 @@
 use anyhow::Result as AnyResult;
 use aoc_2020::lines;
 
+/// Returns a partitioner function.
+fn partitioner(l: char, r: char) -> impl Fn(&str, usize, usize) -> usize {
+    move |arr: &str, mut lo: usize, mut hi: usize| -> usize {
+        for d in arr.chars() {
+            match d {
+                d if d == l => hi = (hi + lo) / 2,
+                d if d == r => lo = (hi + lo) / 2 + 1,
+                _ => unreachable!(),
+            }
+        }
+
+        lo
+    }
+}
+
 /// Get the seat id for a given line.
 fn get_seat_id(line: &str) -> usize {
-    let (row_dirs, col_dirs) = (&line[..7], &line[7..]);
+    let (rows, cols) = (&line[..7], &line[7..]);
+    let row = partitioner('F', 'B')(rows, 0, 127);
+    let col = partitioner('L', 'R')(cols, 0, 7);
 
-    let (mut min_row, mut max_row) = (0, 127);
-    for row_dir in row_dirs.chars() {
-        match row_dir {
-            'F' => max_row = (max_row + min_row) / 2,
-            'B' => min_row = (max_row + min_row) / 2 + 1,
-            _ => unreachable!(),
-        }
-    }
-
-    let (mut min_col, mut max_col) = (0, 7);
-    for col_dir in col_dirs.chars() {
-        match col_dir {
-            'L' => max_col = (max_col + min_col) / 2,
-            'R' => min_col = (max_col + min_col) / 2 + 1,
-            _ => unreachable!(),
-        }
-    }
-
-    min_row * 8 + min_col
+    row * 8 + col
 }
 
 /// Load contents of file and map each line to its seat id.
