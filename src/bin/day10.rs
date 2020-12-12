@@ -21,6 +21,27 @@ fn diffs(adapters: &[usize]) -> HashMap<usize, usize> {
     diffs
 }
 
+fn possibilities(adapters: &[usize]) -> usize {
+    let diffs = adapters.windows(2).map(|w| w[1] - w[0]);
+
+    let mut acc = 1;
+    let mut len = 0;
+
+    for diff in diffs {
+        if diff != 1 {
+            if len > 1 {
+                acc *= (len * (len - 1)) / 2 + 1
+            }
+
+            len = 0;
+        } else {
+            len += 1;
+        }
+    }
+
+    acc
+}
+
 fn main() -> AnyResult<()> {
     let mut adapters = load()?;
 
@@ -34,6 +55,7 @@ fn main() -> AnyResult<()> {
     let diffs = diffs(&adapters);
     println!("Diffs: {:?}", diffs);
     println!("Day 10, Part 1: {}", diffs[&1] * diffs[&3]);
+    println!("Day 10, Part 2: {}", possibilities(&adapters));
 
     Ok(())
 }
