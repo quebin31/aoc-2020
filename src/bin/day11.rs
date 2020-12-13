@@ -10,8 +10,8 @@ enum State {
 
 #[derive(Debug, Copy, Clone)]
 enum NewStateOp {
-    Part1,
-    Part2,
+    PartOne,
+    PartTwo,
 }
 
 #[derive(Debug, Clone)]
@@ -57,8 +57,8 @@ impl Layout {
         for i in 0..rows {
             for j in 0..cols {
                 temp_map[i][j] = match op {
-                    NewStateOp::Part1 => self.new_state_p1(i, j),
-                    NewStateOp::Part2 => self.new_state_p2(i, j),
+                    NewStateOp::PartOne => self.new_state_part_one(i, j),
+                    NewStateOp::PartTwo => self.new_state_part_two(i, j),
                 };
             }
         }
@@ -71,25 +71,36 @@ impl Layout {
         }
     }
 
-    fn new_state_p1(&self, r: usize, c: usize) -> State {
+    fn get(&self, i: i32, j: i32) -> Option<&State> {
+        if i < 0 || j < 0 {
+            None
+        } else {
+            self.map
+                .get(i as usize)
+                .map(|row| row.get(j as usize))
+                .flatten()
+        }
+    }
+
+    fn new_state_part_one(&self, r: usize, c: usize) -> State {
         if let State::Floor = self.map[r][c] {
             return State::Floor;
         }
 
         let mut occupied = 0;
-        'row_loop: for i in r.saturating_sub(1)..=(r + 1) {
-            for j in c.saturating_sub(1)..=(c + 1) {
-                if i == r && j == c {
+        'main: for i in -1..=1i32 {
+            for j in -1..=1i32 {
+                if i == 0 && j == 0 {
                     continue;
                 }
 
-                let maybe_seat = self.map.get(i).map(|r| r.get(j)).flatten();
+                let maybe_seat = self.get(r as i32 + i, c as i32 + j);
                 if let Some(State::Occupied) = maybe_seat {
                     occupied += 1;
                 }
 
                 if occupied >= 4 {
-                    break 'row_loop;
+                    break 'main;
                 }
             }
         }
@@ -101,18 +112,40 @@ impl Layout {
         }
     }
 
-    fn new_state_p2(&self, r: usize, c: usize) -> State {
+    fn new_state_part_two(&self, r: usize, c: usize) -> State {
         if let State::Floor = self.map[r][c] {
             return State::Floor;
         }
 
         let mut occupied = 0;
-        for level in 1.. {
-            for i in (r.saturating_sub(level)..=(r + level)).step_by(level) {
-                for j in (c.saturating_sub(level)..=(c + level)).step_by(level) {
-                    if i == r && j == c {
-                        continue;
+        'main: for i in -1..=1i32 {
+            for j in -1..=1i32 {
+                if i == 0 && j == 0 {
+                    continue;
+                }
+
+                let mut ii = r as i32 + i;
+                let mut jj = c as i32 + j;
+                while let Some(state) = self.get(ii, jj) {
+                    match state {
+                        State::Floor => {
+                            ii += i;
+                            jj += j;
+                        }
+
+                        State::Empty => {
+                            break;
+                        }
+
+                        State::Occupied => {
+                            occupied += 1;
+                            break;
+                        }
                     }
+                }
+
+                if occupied >= 5 {
+                    break 'main;
                 }
             }
         }
@@ -127,11 +160,11 @@ impl Layout {
 
 fn main() -> AnyResult<()> {
     let mut layout = Layout::load()?;
-    while layout.step(NewStateOp::Part1) {}
+    while layout.step(NewStateOp::PartOne) {}
     println!("Day 11, Part 1: {}", layout.occupied());
 
     let mut layout = Layout::load()?;
-    while layout.step(NewStateOp::Part2) {}
+    while layout.step(NewStateOp::PartTwo) {}
     println!("Day 11, Part 2: {}", layout.occupied());
 
     Ok(())
