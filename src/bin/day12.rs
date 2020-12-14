@@ -40,10 +40,13 @@ fn load_actions() -> AnyResult<Vec<Action>> {
 struct Point(i32, i32);
 
 impl Point {
+    /// Rotate the point using a value in degrees (clockwise) using the
+    /// rotation matrix for a 2d point.
     fn rotate(self, deg: f64) -> Self {
-        let deg = deg.to_radians();
-        let cos = deg.cos();
-        let sin = deg.sin();
+        // Convert degrees to radians
+        let rad = deg.to_radians();
+        let cos = rad.cos();
+        let sin = rad.sin();
 
         let x = self.0 as f64 * cos + self.1 as f64 * sin;
         let y = self.0 as f64 * -sin + self.1 as f64 * cos;
@@ -63,6 +66,8 @@ impl Ferry {
     }
 
     fn navigate_part_one(&mut self, actions: &[Action]) {
+        // Let's have a unit vector indicating where are we facing
+        // (1, 0) is over the +x axis (east)
         let mut facing = Point(1, 0);
 
         for action in actions {
@@ -89,6 +94,7 @@ impl Ferry {
     }
 
     fn navigate_part_two(&mut self, actions: &[Action]) {
+        // Waypoint starting point
         let mut waypoint = Point(10, 1);
 
         for action in actions {
