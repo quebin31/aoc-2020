@@ -21,6 +21,11 @@ fn diffs(adapters: &[usize]) -> HashMap<usize, usize> {
     diffs
 }
 
+/// Calculate the difference vector and then count how many valid combinations
+/// are in the groups of 1's with length greater or equal to 2, multiply those
+/// combinations to get the full number of valid combinations. The magic is in
+/// (len * (len - 1)) / 2 + 1, I'll need some time to fully explain how does it
+/// works, but it only works if the vector of differences contains 1's and 3's.
 fn possibilities(adapters: &[usize]) -> usize {
     let diffs = adapters.windows(2).map(|w| w[1] - w[0]);
 

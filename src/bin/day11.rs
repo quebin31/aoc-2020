@@ -71,6 +71,7 @@ impl Layout {
         }
     }
 
+    /// Return the state at position (i, j) where i and j can be negative.
     fn get(&self, i: i32, j: i32) -> Option<&State> {
         if i < 0 || j < 0 {
             None
@@ -82,6 +83,8 @@ impl Layout {
         }
     }
 
+    /// Count how many states are occupied around (r, c) and return the new
+    /// state of (r, c) based on that.
     fn new_state_part_one(&self, r: usize, c: usize) -> State {
         if let State::Floor = self.map[r][c] {
             return State::Floor;
@@ -126,8 +129,10 @@ impl Layout {
 
                 let mut ii = r as i32 + i;
                 let mut jj = c as i32 + j;
+                // Keep searching in the sight of view.
                 while let Some(state) = self.get(ii, jj) {
                     match state {
+                        // Continue searching if the state seen is floor.
                         State::Floor => {
                             ii += i;
                             jj += j;
